@@ -1,0 +1,65 @@
+<html>
+<head>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+</head>
+<body>
+<fieldset>
+    <legend>custom roles</legend>
+    custom-administrator rights - {{custom-administrator-rights}} <br/>
+    user rights - {{user-rights}} <br/>
+</fieldset>
+
+<fieldset>
+    <legend>default portlet action</legend>
+    portlet-resource VIEW - {{VIEW-available}}<br/>
+    portlet-resource CONFIGURATION - {{CONFIGURATION-available}}<br/>
+    portlet-resource ADD_TO_PAGE - {{ADD_TO_PAGE-available}}<br/>
+</fieldset>
+
+<br/>
+Messages: <br/>
+<table style="width: 100%;">
+    {{#messages}}
+    <tr>
+        <td>
+            {{id}}
+        </td>
+        <td>
+            {{body}}
+        </td>
+        <td>
+            <input type="button" value="remove" onclick="removeMessage({{id}})"/>
+        </td>
+    </tr>
+    {{/messages}}
+</table>
+
+<br/>
+{{#ADD_MESSAGE_ACTION-available}}
+<div>
+    <input type="text" value="new message" id="newMessageValue"/>
+    <input type="button" value="send message" onclick="addMessage($('#newMessageValue').val())"/>
+</div>
+{{/ADD_MESSAGE_ACTION-available}}
+{{^ADD_MESSAGE_ACTION-available}}
+You have no permission to add new message
+<div>
+    <input disabled type="text" value="new message"/>
+    <input disabled type="button" value="send message" />
+</div>
+{{/ADD_MESSAGE_ACTION-available}}
+<br/>
+<input type="hidden" id="resourceUrl" value="{{resourceUrl}}">
+<script type="text/javascript">
+    var addMessage = function (text) {
+        $.post($('#resourceUrl').val(), {action: "add", text: text}).done(function () {
+            window.location.reload();
+        });
+    }
+    var removeMessage = function (id) {
+        $.post($('#resourceUrl').val(), {action: "remove", id: id}).done(function () {
+            window.location.reload();
+        });
+    }
+</script>
+</body>
