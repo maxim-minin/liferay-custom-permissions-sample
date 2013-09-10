@@ -6,7 +6,8 @@ import com.liferay.portal.theme.ThemeDisplay
 import com.liferay.portal.util.PortalUtil
 import com.liferay.portal.kernel.portlet.LiferayPortletSession
 import com.liferay.portal.service._
-import com.liferay.portal.model.ResourceConstants
+import com.liferay.portal.model.{ResourcePermission, ResourceConstants}
+import com.liferay.counter.service.CounterLocalServiceUtil
 
 object PermissionHelper {
 
@@ -28,14 +29,14 @@ object PermissionHelper {
     themeDisplay.getPermissionChecker.hasPermission(groupId, resourceName, primaryId, action)
   }
 
-  def addResource(request: PortletRequest, resourceName: String, resourceId: Long) {
+  def addResource(request: PortletRequest, resourceName: String, resourceId: Long, groupPermissions: Array[String], guestPermissions: Array[String]) {
     val themeDisplay = request.getAttribute(WebKeys.THEME_DISPLAY).asInstanceOf[ThemeDisplay]
 
     val companyId = themeDisplay.getCompanyId
     val groupId = themeDisplay.getScopeGroupId
     val userId = themeDisplay.getUserId
 
-    ResourceLocalServiceUtil.addResources(companyId, groupId, userId, resourceName, resourceId, false, false, true)
+    ResourceLocalServiceUtil.addModelResources(companyId, groupId, userId, resourceName, resourceId, groupPermissions, guestPermissions)
   }
 
   def removeResource(request: PortletRequest, resourceName: String, resourceId: Long) = {

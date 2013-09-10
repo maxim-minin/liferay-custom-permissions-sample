@@ -2,10 +2,10 @@ package com.arcusys.customSecurityTest
 
 import javax.portlet._
 import org.scalatra.ScalatraFilter
-import java.util.Date
 import com.arcusys.scala.scalatra.mustache.MustacheSupport
 import com.arcusys.customSecurityTest.repository.MessagesRepository
 import com.liferay.portal.security.auth.PrincipalException
+import com.arcusys.customSecurityTest.model.MessageWithPermissions
 
 class Portlet extends GenericPortlet with ScalatraFilter with MustacheSupport {
 
@@ -28,7 +28,9 @@ class Portlet extends GenericPortlet with ScalatraFilter with MustacheSupport {
       "CONFIGURATION-available" -> PermissionHelper.hasPermission(request, "CONFIGURATION"),
       "ADD_TO_PAGE-available" -> PermissionHelper.hasPermission(request, "ADD_TO_PAGE"),
 
-      "messages" -> MessagesRepository.getAll.filter(message => PermissionHelper.hasPermission(request, VIEW_MESSAGE_ACTION, RESOURCE_NAME, message.id)),
+      "messages" -> MessagesRepository.getAll
+        .filter(message => PermissionHelper.hasPermission(request, VIEW_MESSAGE_ACTION, RESOURCE_NAME, message.id))
+        .map(message => MessageWithPermissions(message, PermissionHelper.hasPermission(request, REMOVE_MESSAGE_ACTION, RESOURCE_NAME, message.id))),
       "ADD_MESSAGE_ACTION-available" -> PermissionHelper.hasPermission(request, ADD_MESSAGE_ACTION)
     )
 
@@ -47,9 +49,14 @@ class Portlet extends GenericPortlet with ScalatraFilter with MustacheSupport {
   def add(request: ResourceRequest, response: ResourceResponse) {
     if (!PermissionHelper.hasPermission(request, ADD_MESSAGE_ACTION)) throw new PrincipalException()
 
+    val guestPermissions = Map(
+      VIEW_MESSAGE_ACTION -> request.getParameter("guestView").toBoolean,
+      REMOVE_MESSAGE_ACTION -> request.getParameter("guestRemove").toBoolean
+    ).filter(_._2).map(_._1).toArray
+
     val message = MessagesRepository.create(request.getParameter("text"))
 
-    PermissionHelper.addResource(request, RESOURCE_NAME, message.id)
+    PermissionHelper.addResource(request, RESOURCE_NAME, message.id, Array(), guestPermissions)
   }
 
   def remove(request: ResourceRequest, response: ResourceResponse) {

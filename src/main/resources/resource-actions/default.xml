@@ -30,7 +30,7 @@
     </portlet-resource>
 
     <model-resource>
-        <model-name>com.arcusys.customSecurityTest.model.Message</model-name>
+        <model-name> com.arcusys.customSecurityTest.model.Message</model-name>
         <portlet-ref>
             <portlet-name>customSecurityTest</portlet-name>
         </portlet-ref>
@@ -42,10 +42,9 @@
             <site-member-defaults>
                 <action-key>VIEW_MESSAGE_ACTION</action-key>
             </site-member-defaults>
-            <guest-defaults/>
-            <guest-unsupported>
-                <action-key>REMOVE_MESSAGE_ACTION</action-key>
-            </guest-unsupported>
+            <guest-defaults>
+            </guest-defaults>
+            <guest-unsupported />
         </permissions>
     </model-resource>
 </resource-action-mapping>

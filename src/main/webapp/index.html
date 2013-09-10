@@ -21,14 +21,18 @@ Messages: <br/>
 <table style="width: 100%;">
     {{#messages}}
     <tr>
+        {{#message}}
         <td>
             {{id}}
         </td>
         <td>
             {{body}}
         </td>
+        {{/message}}
         <td>
-            <input type="button" value="remove" onclick="removeMessage({{id}})"/>
+            {{#canRemove}}
+            <input type="button" value="remove" onclick="removeMessage({{#message}}{{id}}{{/message}})"/>
+            {{/canRemove}}
         </td>
     </tr>
     {{/messages}}
@@ -38,7 +42,13 @@ Messages: <br/>
 {{#ADD_MESSAGE_ACTION-available}}
 <div>
     <input type="text" value="new message" id="newMessageValue"/>
-    <input type="button" value="send message" onclick="addMessage($('#newMessageValue').val())"/>
+    <input type="button" value="send message" onclick="addMessage($('#newMessageValue').val(),$('#newMessageViewForGuest').is(':checked'),$('#newMessageRemoveForGuest').is(':checked'))"/>
+
+    <input type="checkbox" id="newMessageViewForGuest" />
+    <label for="newMessageViewForGuest" >guest can view</label>
+
+    <input type="checkbox" id="newMessageRemoveForGuest" />
+    <label for="newMessageRemoveForGuest" >guest can remove</label>
 </div>
 {{/ADD_MESSAGE_ACTION-available}}
 {{^ADD_MESSAGE_ACTION-available}}
@@ -51,8 +61,8 @@ You have no permission to add new message
 <br/>
 <input type="hidden" id="resourceUrl" value="{{resourceUrl}}">
 <script type="text/javascript">
-    var addMessage = function (text) {
-        $.post($('#resourceUrl').val(), {action: "add", text: text}).done(function () {
+    var addMessage = function (text, guestView, guestRemove) {
+        $.post($('#resourceUrl').val(), {action: "add", text: text, guestView:guestView, guestRemove:guestRemove }).done(function () {
             window.location.reload();
         });
     }
